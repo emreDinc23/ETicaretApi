@@ -1,4 +1,7 @@
-﻿using ETicaretApi.Application.Repositories.ProductRepositories;
+﻿using ETicaretApi.Application.Repositories.CustomerRepositories;
+using ETicaretApi.Application.Repositories.OrderRepositories;
+using ETicaretApi.Application.Repositories.ProductRepositories;
+using ETicaretApi.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ETicaretApi.Api.Controllers
@@ -9,21 +12,27 @@ namespace ETicaretApi.Api.Controllers
     {
         readonly private IProductWriteRepository _productWriteRepository;
         readonly private IProductReadRepository _productReadRepository;
+        readonly private IOrderWriteRepository _orderWriteRepository;
+        readonly private ICustomerWriteRepository _customerWriteRepository;
+        readonly private IOrderReadRepository _orderReadRepository;
 
-        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository)
+        public ProductsController(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository, IOrderWriteRepository orderWriteRepository, ICustomerWriteRepository customerWriteRepository, IOrderReadRepository orderReadRepository)
         {
             _productWriteRepository = productWriteRepository;
             _productReadRepository = productReadRepository;
+            _orderWriteRepository = orderWriteRepository;
+            _customerWriteRepository = customerWriteRepository;
+            _orderReadRepository = orderReadRepository;
         }
+
         [HttpGet]
-        public async void Get()
+        public async Task Get()
         {
-            await _productWriteRepository.AddRangeAsync(new() {
-             new(){Id=Guid.NewGuid(),Name="Product1",Price=100,CreatedDate=DateTime.UtcNow,Stock=10},
-             new(){Id=Guid.NewGuid(),Name="Product2",Price=150,CreatedDate=DateTime.UtcNow,Stock=15},
-             new(){Id=Guid.NewGuid(),Name="Product3",Price=160,CreatedDate=DateTime.UtcNow,Stock=14},
-             new(){Id=Guid.NewGuid(),Name="Product4",Price=170,CreatedDate=DateTime.UtcNow,Stock=13}});
-            await _productWriteRepository.SaveAsync();
+            Order order = await _orderReadRepository.GetByIdAsync("d7609d84-ab3d-4100-b4ae-4b9342214a05");
+            order.Address = "New Address";
+            await _orderWriteRepository.SaveAsync();
         }
+
+
     }
 }
